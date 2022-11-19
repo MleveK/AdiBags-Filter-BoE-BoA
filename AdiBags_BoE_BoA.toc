@@ -2,8 +2,11 @@
 
 ## Title: AdiBags - Filter for BoE/BoA
 ## Notes: Adds BoE/BoA filters to AdiBags.
-## Author: MleveK
-## Version: v10.0.2.0
+## Author: @project-author@
+## Version: @project-version@
+## X-Date: @project-date-iso@
+## X-Curse-Project-ID: 705236
+## X-Category: Bags & Inventory
 
 ## Dependencies: AdiBags
 
