@@ -8,8 +8,8 @@ local _, ns = ...
 
 local addon = LibStub('AceAddon-3.0'):GetAddon('AdiBags')
 local L = setmetatable({}, {__index = addon.L})
-
-do -- Localization
+-- Localization
+do
   L["Bound"] = "Bound"
   L["Put BOE/BOA in their own sections."] = "Put BOE/BOA in their own sections."
 
@@ -33,23 +33,7 @@ do -- Localization
   end
 end
 
-local tooltip
-local function create()
-  --local tip, leftside = CreateFrame("GameTooltip"), {}
-  local tip, leftside = CreateFrame( "GameTooltip", "AdiBagsBoEBoAScan" ), {} 
-  for i = 1,6 do
-    local L,R = tip:CreateFontString(), tip:CreateFontString()
-    L:SetFontObject(GameFontNormal)
-    R:SetFontObject(GameFontNormal)
-    tip:AddFontStrings(L,R)
-    leftside[i] = L
-  end
-  tip.leftside = leftside
-  return tip
-end
-
--- The filter itself
-
+-- Filter
 local setFilter = addon:RegisterFilter("Bound", 92, 'ABEvent-1.0')
 setFilter.uiName = L['Bound']
 setFilter.uiDesc = L['Put BOE/BOA in their own sections.']
@@ -73,28 +57,24 @@ function setFilter:OnDisable()
   addon:UpdateFilters()
 end
 
-local setNames = {}
-
 function setFilter:Filter(slotData)
-  tooltip = tooltip or create()
-  tooltip:SetOwner(UIParent,"ANCHOR_NONE")
-  tooltip:ClearLines()
+  local tooltip = C_TooltipInfo.GetBagItem(slotData.bag, slotData.slot)
+	TooltipUtil.SurfaceArgs(tooltip)
 
-if slotData.bag == BANK_CONTAINER then
-	tooltip:SetInventoryItem("player", BankButtonIDToInvSlotID(slotData.slot, nil))
-else
-	tooltip:SetBagItem(slotData.bag, slotData.slot)
-end
+	for _, lines in ipairs(tooltip.lines) do
+		TooltipUtil.SurfaceArgs(lines)
+	end
 
-  for i = 1,6 do
-    local t = tooltip.leftside[i]:GetText()
-    if self.db.profile.enableBoE and t == ITEM_BIND_ON_EQUIP then
-      return L["BoE"]
-    elseif self.db.profile.enableBoA and (t == ITEM_ACCOUNTBOUND or t == ITEM_BIND_TO_BNETACCOUNT or t == ITEM_BNETACCOUNTBOUND) then
-      return L["BoA"]
+  for i = 1,3 do
+    if tooltip.lines[i] then
+      local t = tooltip.lines[i].leftText
+      if self.db.profile.enableBoE and t == ITEM_BIND_ON_EQUIP then
+        return L["BoE"]
+      elseif self.db.profile.enableBoA and (t == ITEM_ACCOUNTBOUND or t == ITEM_BIND_TO_BNETACCOUNT or t == ITEM_BNETACCOUNTBOUND) then
+        return L["BoA"]
+      end
     end
   end
-  tooltip:Hide()
 end
 
 function setFilter:GetOptions()
